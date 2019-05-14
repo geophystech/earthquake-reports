@@ -68,7 +68,7 @@ optional arguments:
 
 ### eqmap examples
 
-Just plot events from USGS for 1 year:
+**Just plot events from USGS for 1 year:**
 
 `eqmap.py 140 165 40 60 --from-usgs --date-min 2018-01-01 --date-max 2019-01-01`
 
@@ -76,7 +76,7 @@ Just plot events from USGS for 1 year:
 
 [catalog.xlsx](https://github.com/geophystech/earthquake-reports/files/3177543/catalog.xlsx)
 
-Plot from USGS, 1y, M ≥ 5.5, only crust and interplate, numerate events:
+**Plot from USGS, 1y, M ≥ 5.5, only crust and interplate, numerate events:**
 
 `eqmap.py 140 165 40 60 --from-usgs --date-min 2018-01-01 --date-max 2019-01-01 --mag-min=5.5 --depth-max=150 --numerate`
 
@@ -84,7 +84,7 @@ Plot from USGS, 1y, M ≥ 5.5, only crust and interplate, numerate events:
 
 [catalog.xlsx](https://github.com/geophystech/earthquake-reports/files/3177574/catalog.xlsx)
 
-Plot from EQALERT, 10y, M ≥ 3.0, plot stations, with full resolution basemap:
+**Plot from EQALERT, 10y, M ≥ 3.0, plot stations, with full resolution basemap:**
 
 `eqmap.py 140 145 50 55 --date-min 2009-01-01 --date-max 2019-01-01 --mag-min 3.0 --plot-stations --full-resolution --login a.stepnov@geophystech.ru --pass SECRET`
 
@@ -92,7 +92,7 @@ Plot from EQALERT, 10y, M ≥ 3.0, plot stations, with full resolution basemap:
 
 [catalog.xlsx](https://github.com/geophystech/earthquake-reports/files/3177674/catalog.xlsx)
 
-Plot shape file example:
+**Plot shape file example:**
 
 `eqmap.py 130 150 40 55 --from-usgs --date-min 1950-01-01 --date-max 2019-01-01 --mag-min 7.0 --shape-file ~/Desktop/mygeodata/test-polygon`
 
