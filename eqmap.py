@@ -192,27 +192,27 @@ def get_earthquake_data(
         headers = {'Authorization': 'Bearer ' + token}
     else:
         headers = None
-    responce = requests.get(url, params, headers=headers)
-    print('Constructed URL: ', responce.url)
-    if responce.status_code != 200:
+    response = requests.get(url, params, headers=headers)
+    print('Constructed URL: ', response.url)
+    if response.status_code != 200:
         print('An error occurred wile fetching the data:')
-        print('HTTP status code: ', responce.status_code)
-        print(responce.json())
+        print('HTTP status code: ', response.status_code)
+        print(response.json())
         sys.exit(1)
-    df_norm = json_normalize(responce.json()[json_object])
+    df_norm = json_normalize(response.json()[json_object])
     if df_norm.empty:
         print('Events no found, please modify request parameters')
         sys.exit(0)
     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.io.json.json_normalize.html
     # That strange IF below because
-    # json_normalize(responce.json()[json_object]) and
-    # json_normalize(responce.json(), json_object)
+    # json_normalize(response.json()[json_object]) and
+    # json_normalize(response.json(), json_object)
     # return **different** results while parsing USGS/EQALERT json response.
     # So, USGS have not cursor and it is possible to parse only
     # nested 'Feature' object. For EQALERT it's required to pass
     # data and meta json objects.
     if meta_object:
-        meta_norm = json_normalize(responce.json()[meta_object])
+        meta_norm = json_normalize(response.json()[meta_object])
         print('return with meta')
         return (df_norm, meta_norm)
     return df_norm
