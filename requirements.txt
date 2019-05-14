@@ -1,5 +1,7 @@
 requests
 pandas
-import matplotlib
-import numpy
+matplotlib
+numpy
 adjustText
+# note that you must install basemap,
+# see https://github.com/matplotlib/basemap
