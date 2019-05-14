@@ -13,6 +13,7 @@ import requests
 import pandas as pd
 from pandas.io.json import json_normalize
 import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.basemap import Basemap

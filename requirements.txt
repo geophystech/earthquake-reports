@@ -1,7 +1,8 @@
 requests
 pandas
 matplotlib
-numpy
+numpy>=1.12.0
 adjustText
+openpyxl
 # note that you must install basemap,
 # see https://github.com/matplotlib/basemap

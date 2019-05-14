@@ -10,7 +10,9 @@ AND optionally update it `pip3 install --upgrade pip`
 
 Install matplotlib basemap via apt: `sudo apt install python3-mpltoolkits.basemap python-mpltoolkits.basemap-data`
 
-Instal project dependencies: ``
+Instal project dependencies: `pip install -r earthquake-reports/requirements.txt`
+
+Check: `earthquake-reports/eqmap.py -h`
 
 ## eqmap.py
 
