@@ -1,5 +1,17 @@
 # earthquake-reports
 
+## installation example (ubuntu)
+
+Clone: `git clone https://github.com/geophystech/earthquake-reports.git`
+
+Install pip for python3: `sudo apt install python3-pip`
+
+AND optionally update it `pip3 install --upgrade pip`
+
+Install matplotlib basemap via apt: `sudo apt install python3-mpltoolkits.basemap python-mpltoolkits.basemap-data`
+
+Instal project dependencies: ``
+
 ## eqmap.py
 
 This script generates PNG map and XLSX files.
