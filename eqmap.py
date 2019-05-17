@@ -131,6 +131,7 @@ else:
 
 EQALERT_LOGIN = ARGS.login
 EQALERT_PASSWORD = ARGS.password
+
 USGS_ENDPOINT = 'https://earthquake.usgs.gov/fdsnws/event/1/query'
 USGS_JSON_OBJECT = 'features'
 
@@ -148,6 +149,32 @@ USGS_GET_PARAMS = {
         'maxlongitude': LON_MAX
         }
 
+USGS_DATA_SELECTED_COLUMNS_1 = [
+        'id', 'properties.time', 'properties.mag', 'properties.magType',
+        'properties.net', 'properties.title', 'properties.mmi',
+        'properties.url']
+
+USGS_DATA_SELECTED_COLUMNS_2 = ['lon', 'lat', 'depth']
+
+USGS_COLUMNS_RENAME = {
+        "id": "id",
+        "properties.time": "event_datetime",
+        "lat": "lat",
+        "lon": "lon",
+        "depth": "depth",
+        "properties.mag": "mag",
+        "properties.magType": "mag_t",
+        "properties.net": "agency",
+        "properties.title": "nearestCity_title",
+        "properties.mmi": "intensity",
+        "properties.url": "event_page"}
+
+USGS_COLUMNS_REORDER = [
+        'id', 'event_datetime', 'lat', 'lon', 'depth',
+        'mag', 'mag_t', 'agency', 'nearestCity_title',
+        'intensity', 'event_page']
+
+
 EQALERT_GET_LIST_PARAMS = {
         'include': 'nearestCity',
         'limit': 100,
@@ -161,6 +188,33 @@ EQALERT_GET_LIST_PARAMS = {
 GET_STATIONS_PARAMS = {
         'has_realtime': 1
         }
+
+EQALERT_DATA_SELECTED_COLUMNS = [
+        'id', 'locValues.data.event_datetime', 'locValues.data.lat',
+        'locValues.data.lon', 'locValues.data.depth',
+        'locValues.data.mag', 'locValues.data.mag_t',
+        'agency',
+        'nearestCity.data.settlement.data.translation.data.title',
+        'nearestCity.data.settlement.data.translation.data.region',
+        'nearestCity.data.msk64_value',
+        'site_url']
+
+EQALERT_COLUMNS_RENAME = {
+        "id": "id",
+        "locValues.data.event_datetime": "event_datetime",
+        "locValues.data.lat": "lat",
+        "locValues.data.lon": "lon",
+        "locValues.data.depth": "depth",
+        "locValues.data.mag": "mag",
+        "locValues.data.mag_t": "mag_t",
+        "agency": "agency",
+        "nearestCity.data.settlement.data.translation.data.title":
+        "nearestCity_title",
+        "nearestCity.data.settlement.data.translation.data.region":
+        "nearestCity_regeon",
+        "nearestCity.data.msk64_value": "nearestCity_intensity",
+        "site_url": "event_page"}
+
 
 if DATETIME_MIN:
     USGS_GET_PARAMS['starttime'] = DATETIME_MIN
@@ -241,34 +295,18 @@ if FROM_USGS:
     EQ_LIST_FULL = get_earthquake_data(
         USGS_ENDPOINT, USGS_GET_PARAMS, USGS_JSON_OBJECT)
     # select meaningfull columns for plotting
-    EQ_LIST_SELECTED = EQ_LIST_FULL[
-        ['id', 'properties.time', 'properties.mag', 'properties.magType',
-         'properties.net', 'properties.title', 'properties.mmi',
-         'properties.url']].copy()
-    EQ_LIST_SELECTED[['lon', 'lat', 'depth']] = pd.DataFrame(
+    EQ_LIST_SELECTED = EQ_LIST_FULL[USGS_DATA_SELECTED_COLUMNS_1].copy()
+    EQ_LIST_SELECTED[USGS_DATA_SELECTED_COLUMNS_2] = pd.DataFrame(
         EQ_LIST_FULL['geometry.coordinates'].values.tolist(),
-        columns=['lon', 'lat', 'depth'])
+        columns=USGS_DATA_SELECTED_COLUMNS_2)
     EQ_LIST_SELECTED = EQ_LIST_SELECTED.rename(
         index=str,
-        columns={
-            "id": "id",
-            "properties.time": "event_datetime",
-            "lat": "lat",
-            "lon": "lon",
-            "depth": "depth",
-            "properties.mag": "mag",
-            "properties.magType": "mag_t",
-            "properties.net": "agency",
-            "properties.title": "nearestCity_title",
-            "properties.mmi": "intensity",
-            "properties.url": "event_page"})
-    EQ_LIST_SELECTED = EQ_LIST_SELECTED[[
-        'id', 'event_datetime', 'lat', 'lon', 'depth',
-        'mag', 'mag_t', 'agency', 'nearestCity_title',
-        'intensity', 'event_page']]
+        columns=USGS_COLUMNS_RENAME)
+    # reorder columns
+    EQ_LIST_SELECTED = EQ_LIST_SELECTED[USGS_COLUMNS_REORDER]
+    # convert time stampt to human related
     EQ_LIST_SELECTED['event_datetime'] = pd.to_datetime(
         EQ_LIST_SELECTED['event_datetime'], unit='ms')
-    EQ_LIST_SELECTED.index = np.arange(1, len(EQ_LIST_SELECTED)+1)
 else:
     print('Gathering events from EQALERT API...')
     print('Params are ', EQALERT_GET_LIST_PARAMS)
@@ -283,6 +321,7 @@ else:
         token=TOKEN)
     EQ_LIST_FULL = DATA_WITH_META[0]
     META = DATA_WITH_META[1]
+    # getting next page if exist
     print('Number of events on THIS page: ',
           META['cursor.count'].iloc[0])
     while META['cursor.next'].iloc[0]:
@@ -301,34 +340,15 @@ else:
               META['cursor.count'].iloc[0])
     # select meaningfull columns for plotting
     EQ_LIST_SELECTED = EQ_LIST_FULL.copy()
-    EQ_LIST_SELECTED = EQ_LIST_SELECTED[[
-        'id', 'locValues.data.event_datetime', 'locValues.data.lat',
-        'locValues.data.lon', 'locValues.data.depth',
-        'locValues.data.mag', 'locValues.data.mag_t',
-        'agency',
-        'nearestCity.data.settlement.data.translation.data.title',
-        'nearestCity.data.settlement.data.translation.data.region',
-        'nearestCity.data.msk64_value',
-        'site_url']]
+    EQ_LIST_SELECTED = EQ_LIST_SELECTED[EQALERT_DATA_SELECTED_COLUMNS]
     EQ_LIST_SELECTED = EQ_LIST_SELECTED.rename(
         index=str,
-        columns={
-            "id": "id",
-            "locValues.data.event_datetime": "event_datetime",
-            "locValues.data.lat": "lat",
-            "locValues.data.lon": "lon",
-            "locValues.data.depth": "depth",
-            "locValues.data.mag": "mag",
-            "locValues.data.mag_t": "mag_t",
-            "agency": "agency",
-            "nearestCity.data.settlement.data.translation.data.title":
-            "nearestCity_title",
-            "nearestCity.data.settlement.data.translation.data.region":
-            "nearestCity_regeon",
-            "nearestCity.data.msk64_value": "nearestCity_intensity",
-            "site_url": "event_page"})
-    EQ_LIST_SELECTED.index = np.arange(1, len(EQ_LIST_SELECTED)+1)
+        columns=EQALERT_COLUMNS_RENAME)
 
+# reorder events in chronology from earlier to the last
+EQ_LIST_SELECTED = EQ_LIST_SELECTED.iloc[::-1]
+# Generate index from 1 to N
+EQ_LIST_SELECTED.index = np.arange(1, len(EQ_LIST_SELECTED)+1)
 
 print(
     'Total events that were fetched from API: ',
@@ -414,7 +434,7 @@ if PLOT_STATIONS & (not FROM_USGS):
     AX.scatter(
         X, Y,
         color='blue',
-        marker="^", alpha=0.5, zorder=10)
+        marker="^", alpha=0.5, zorder=5)
     ANN_STA = GET_STATIONS.scnl_name.to_list()
     ANNOTATE_STA = [
         AX.text(X[i], Y[i], '%s' % txt) for i, txt in enumerate(ANN_STA)]
